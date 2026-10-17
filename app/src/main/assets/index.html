@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#08110e"><title>LMNT Football AI</title>
+<style>
+:root{--bg:#08110e;--panel:#101d18;--panel2:#14251e;--line:#284236;--green:#42e58b;--muted:#9ab4a5;--text:#f0fff6;--amber:#ffd166}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#142b20 0%,var(--bg) 55%);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:24px 18px 18px;border-bottom:1px solid var(--line)}.brand{font-size:12px;letter-spacing:2px;color:var(--green);font-weight:800}.hero{font-size:29px;font-weight:850;margin:8px 0 4px}.sub{color:var(--muted);font-size:13px;line-height:1.5}
+main{max-width:760px;margin:auto;padding:16px;display:grid;gap:14px}.card{background:linear-gradient(145deg,var(--panel),#0d1914);border:1px solid var(--line);border-radius:18px;padding:16px}.card h2{font-size:17px;margin:0 0 12px}.tag{font-size:11px;color:var(--green);border:1px solid #326a4b;padding:5px 8px;border-radius:30px;display:inline-block;margin-bottom:10px}
+label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#08130e;color:var(--text);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.btn{width:100%;border:0;background:var(--green);color:#062112;font-weight:850;padding:14px;border-radius:12px;margin-top:14px;font-size:15px}.btn2{background:transparent;border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:9px}
+.results{display:none}.prob{background:#0a1711;border:1px solid var(--line);padding:11px 8px;border-radius:12px;text-align:center}.prob b{display:block;font-size:22px;color:var(--green)}.prob span{font-size:11px;color:var(--muted)}.score{text-align:center;padding:18px;background:var(--panel2);border-radius:14px;margin:12px 0}.score strong{font-size:32px;letter-spacing:3px}.score div{font-size:12px;color:var(--muted);margin-top:5px}.metric{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)}.metric:last-child{border:0}.metric span{color:var(--muted)}.notice{font-size:12px;color:var(--amber);line-height:1.5}.history-item{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.empty{color:var(--muted);font-size:13px}footer{text-align:center;color:var(--muted);font-size:11px;padding:8px 20px 26px}
+@media(min-width:620px){main{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+</style></head>
+<body>
+<header><div class="brand">LMNT • FOOTBALL INTELLIGENCE</div><div class="hero">Read the game.</div><div class="sub">AI-style match estimates, form analysis and prediction tracking — built for football fans.</div></header>
+<main>
+<section class="card"><span class="tag">MATCH LAB · DEMO MODEL</span><h2>Build a prediction</h2>
+<div class="row"><div><label for="home">Home team</label><input id="home" value="Manchester City" maxlength="40"></div><div><label for="away">Away team</label><input id="away" value="Arsenal" maxlength="40"></div></div>
+<div class="row"><div><label for="league">Competition</label><select id="league"><option>Premier League</option><option>La Liga</option><option>Champions League</option><option>South African Premiership</option><option>Other</option></select></div><div><label for="venue">Venue</label><select id="venue"><option value="1">Home advantage</option><option value="0">Neutral ground</option></select></div></div>
+<p class="sub">Rate each team from 1 (weak) to 10 (strong). Use recent results and team news to guide your ratings.</p>
+<div class="row"><div><label for="hs">Home strength (1–10)</label><input id="hs" type="number" min="1" max="10" value="7"></div><div><label for="as">Away strength (1–10)</label><input id="as" type="number" min="1" max="10" value="7"></div></div>
+<div class="row"><div><label for="hf">Home recent form (0–15 points)</label><input id="hf" type="number" min="0" max="15" value="10"></div><div><label for="af">Away recent form (0–15 points)</label><input id="af" type="number" min="0" max="15" value="9"></div></div>
+<button class="btn" onclick="predict()">Analyse match</button>
+</section>
+<section class="card results" id="results"><span class="tag">MODEL OUTPUT · ESTIMATE</span><h2 id="matchTitle">Match prediction</h2>
+<div class="three"><div class="prob"><b id="hp">—</b><span>HOME WIN</span></div><div class="prob"><b id="dp">—</b><span>DRAW</span></div><div class="prob"><b id="ap">—</b><span>AWAY WIN</span></div></div>
+<div class="score"><strong id="score">1 – 1</strong><div>Illustrative most-likely scoreline</div></div>
+<div class="metric"><span>Both teams to score</span><b id="btts">—</b></div><div class="metric"><span>Over 2.5 goals</span><b id="over">—</b></div><div class="metric"><span>Estimated total goals</span><b id="goals">—</b></div>
+<p class="notice">These are heuristic estimates from your ratings, not live-data or trained-AI predictions. Confirm fixtures, line-ups and odds independently. No outcome is guaranteed.</p><button class="btn" onclick="savePrediction()">Save to history</button>
+</section>
+<section class="card wide"><h2>Prediction history</h2><div id="history" class="empty">Your saved predictions will appear here on this device.</div><button class="btn2" onclick="clearHistory()">Clear history</button></section>
+<section class="card wide"><h2>What this version can do</h2><div class="metric"><span>Manual match analysis</span><b>Ready</b></div><div class="metric"><span>On-device history</span><b>Ready</b></div><div class="metric"><span>Live fixtures and odds</span><b>Next update</b></div><div class="metric"><span>Model trained on historical results</span><b>Next update</b></div></section>
+</main><footer>LMNT FOOTBALL AI · Version 0.1.0 · Informational estimates only</footer>
+<script>
+let latest=null;
+function val(id,min,max){let n=Number(document.getElementById(id).value);if(!Number.isFinite(n))n=min;return Math.max(min,Math.min(max,n))}
+function predict(){
+ const home=document.getElementById('home').value.trim()||'Home team',away=document.getElementById('away').value.trim()||'Away team';
+ const hs=val('hs',1,10),as=val('as',1,10),hf=val('hf',0,15),af=val('af',0,15),venue=Number(document.getElementById('venue').value);
+ const diff=(hs-as)*0.48+(hf-af)*0.075+venue*0.42;
+ const ph=1/(1+Math.exp(-diff)); const drawBase=Math.max(.17,.31-Math.abs(diff)*.055);
+ let h=(1-drawBase)*ph, a=(1-drawBase)*(1-ph), d=drawBase; const sum=h+a+d;h/=sum;a/=sum;d/=sum;
+ const hg=Math.max(.15,1.18+(hs-5.5)*.14+(hf-7.5)*.035+venue*.18-(as-5.5)*.055);
+ const ag=Math.max(.15,1.05+(as-5.5)*.14+(af-7.5)*.035-(hs-5.5)*.055);
+ const poisson=(k,l)=>Math.exp(-l)*Math.pow(l,k)/fact(k);function fact(n){let x=1;for(let i=2;i<=n;i++)x*=i;return x}
+ let best=[0,0,-1];for(let i=0;i<=5;i++)for(let j=0;j<=5;j++){let p=poisson(i,hg)*poisson(j,ag);if(p>best[2])best=[i,j,p]}
+ const btts=(1-Math.exp(-hg))*(1-Math.exp(-ag));let under=0;for(let i=0;i<=2;i++)for(let j=0;j<=2-i;j++)under+=poisson(i,hg)*poisson(j,ag);
+ latest={home,away,league:document.getElementById('league').value,h:Math.round(h*100),d:Math.round(d*100),a:Math.round(a*100),score:best[0]+'–'+best[1],btts:Math.round(btts*100),over:Math.round((1-under)*100),goals:(hg+ag).toFixed(1),date:new Date().toLocaleString()};
+ document.getElementById('matchTitle').textContent=home+' vs '+away;
+ document.getElementById('hp').textContent=latest.h+'%';document.getElementById('dp').textContent=latest.d+'%';document.getElementById('ap').textContent=latest.a+'%';
+ document.getElementById('score').textContent=latest.score;document.getElementById('btts').textContent=latest.btts+'% estimated';document.getElementById('over').textContent=latest.over+'% estimated';document.getElementById('goals').textContent=latest.goals;
+ document.getElementById('results').style.display='block';document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function getHistory(){try{return JSON.parse(localStorage.getItem('lmntPredictions')||'[]')}catch(e){return []}}
+function savePrediction(){if(!latest){predict()}let arr=getHistory();arr.unshift(latest);arr=arr.slice(0,20);localStorage.setItem('lmntPredictions',JSON.stringify(arr));renderHistory()}
+function renderHistory(){let arr=getHistory(),el=document.getElementById('history');if(!arr.length){el.className='empty';el.textContent='Your saved predictions will appear here on this device.';return}el.className='';el.innerHTML='';arr.forEach(x=>{let d=document.createElement('div');d.className='history-item';d.textContent=x.home+' vs '+x.away+' · H '+x.h+'% / D '+x.d+'% / A '+x.a+'% · Score '+x.score+' · '+x.date;el.appendChild(d)})}
+function clearHistory(){localStorage.removeItem('lmntPredictions');renderHistory()}renderHistory();
+</script></body></html>
